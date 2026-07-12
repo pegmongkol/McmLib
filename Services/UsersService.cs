@@ -115,6 +115,7 @@ namespace McmLib.Services
                 var url = "users/get_companies.php";
                 var payload = new
                 {
+                    token = token,
                     user_id = user_id
                 };
 
@@ -145,6 +146,7 @@ namespace McmLib.Services
                 var url = "users/get_branchs.php";
                 var payload = new
                 {
+                    token = token,
                     user_id,
                     company_id
                 };
