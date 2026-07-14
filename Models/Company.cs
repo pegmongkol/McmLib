@@ -7,6 +7,7 @@ namespace McmLib.Models
     public class Company
     {
         public int? Company_Id { get; set; }
+        public string? CompanyName { get; set; }
         public string? Company_Name { get; set; }
         public string? Company_Name_ENG { get; set; }
     }

@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace McmLib.Models
 {
     public class ApiResponse
@@ -31,11 +33,13 @@ namespace McmLib.Models
 
     public class CompaniesApiResponse : ApiResponse
     {
+        [JsonPropertyName("data")]
         public List<Company> Companies { get; set; } = new List<Company>();
     }
 
     public class BranchesApiResponse : ApiResponse
     {
+        [JsonPropertyName("data")]
         public List<Branch> Branches { get; set; } = new List<Branch>();
     }
 

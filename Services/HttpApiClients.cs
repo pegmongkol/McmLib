@@ -13,7 +13,8 @@ namespace McmLib.Services
         private static readonly HttpClient _httpClient = CreateHttpClient();
         private static Func<string?>? _tokenProvider;
         private const long SlowRequestThresholdMilliseconds = 1000;
-
+        
+                    
         private static readonly HttpStatusCode[] _retryableStatusCodes =
         {
             HttpStatusCode.RequestTimeout,      // 408
@@ -88,15 +89,35 @@ namespace McmLib.Services
             {
                 return default;
             }
-
+            // 1) Try full payload first (works for CompaniesApiResponse with [JsonPropertyName("data")])
             try
             {
-                return JsonSerializer.Deserialize<TResponse>(doc.RootElement.GetRawText(), _jsonOptions);
+                var response = JsonSerializer.Deserialize<TResponse>(doc.RootElement.GetRawText(), _jsonOptions);
+                if (response is not null)
+                {
+                    return response;
+                }
             }
             catch
             {
-                return default;
+                // continue to fallback
             }
+
+            // 2) Fallback: only deserialize nested "data"
+            if (doc.RootElement.ValueKind == JsonValueKind.Object &&
+                doc.RootElement.TryGetProperty("data", out var dataElement))
+            {
+                try
+                {
+                    return JsonSerializer.Deserialize<TResponse>(dataElement.GetRawText(), _jsonOptions);
+                }
+                catch
+                {
+                    return default;
+                }
+            }
+
+            return default;
         }
 
         public static void ConfigureAuthentication(Func<string?> tokenProvider)
@@ -211,7 +232,7 @@ namespace McmLib.Services
 
         private static string? GetCurrentToken()
         {
-            return _tokenProvider?.Invoke();
+            return _tokenProvider?.Invoke();            
         }
 
         private static void LogRequest(HttpMethod method, Uri requestUri, HttpStatusCode? statusCode, long elapsedMilliseconds, bool cancelled = false)

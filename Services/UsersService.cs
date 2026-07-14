@@ -114,8 +114,7 @@ namespace McmLib.Services
             {
                 var url = "users/get_companies.php";
                 var payload = new
-                {
-                    token = token,
+                {                 
                     user_id = user_id
                 };
 
@@ -124,7 +123,7 @@ namespace McmLib.Services
                     payload,
                     "No response from server",
                     cancellationToken);
-
+                if (response.Companies.Count > 0) response.Result = true;
                 return NormalizeCompaniesResponse(response);
             }
             catch (Exception ex)
