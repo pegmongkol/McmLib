@@ -35,12 +35,19 @@ namespace McmLib.Models
     {
         [JsonPropertyName("data")]
         public List<Company> Companies { get; set; } = new List<Company>();
+        
+        [JsonIgnore]
+        public new bool Result => Companies is { Count: > 0 };
     }
 
     public class BranchesApiResponse : ApiResponse
     {
         [JsonPropertyName("data")]
         public List<Branch> Branches { get; set; } = new List<Branch>();
+
+
+        [JsonIgnore]
+        public new bool Result => Branches is { Count: > 0 };
     }
 
     public class LoginAlertApiResponse : ApiResponse

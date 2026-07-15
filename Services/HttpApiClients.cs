@@ -12,6 +12,7 @@ namespace McmLib.Services
         private static readonly Uri _baseUri = new Uri("http://php84.localhost/mcmapi/api/", UriKind.Absolute);
         private static readonly HttpClient _httpClient = CreateHttpClient();
         private static Func<string?>? _tokenProvider;
+        private static Func<string?>? _apiKeyProvider;
         private const long SlowRequestThresholdMilliseconds = 1000;
         
                     
@@ -124,7 +125,10 @@ namespace McmLib.Services
         {
             _tokenProvider = tokenProvider;
         }
-
+        public static void ConfigureAPI_Key(Func<string?> apiKeyProvider)
+        {
+            _apiKeyProvider = apiKeyProvider;
+        }
         private static async Task<JsonDocument?> SendJsonAsync(
             HttpMethod method,
             string url,
@@ -220,7 +224,15 @@ namespace McmLib.Services
                 request.Headers.Remove("X-Token");
                 request.Headers.TryAddWithoutValidation("X-Token", token);
             }
-
+            else
+            {
+                var apiKey = GetCurrentApiKey();
+                if (!string.IsNullOrWhiteSpace(apiKey))
+                {
+                    request.Headers.Remove("X-API-Key");
+                    request.Headers.TryAddWithoutValidation("X-API-Key", apiKey);
+                }
+            }
             if (data != null && (method == HttpMethod.Post || method == HttpMethod.Put || method.Method.Equals("PATCH", StringComparison.OrdinalIgnoreCase)))
             {
                 var json = JsonSerializer.Serialize(data, _jsonOptions);
@@ -234,7 +246,10 @@ namespace McmLib.Services
         {
             return _tokenProvider?.Invoke();            
         }
-
+        private static string? GetCurrentApiKey()
+        {
+            return _apiKeyProvider?.Invoke();
+        }
         private static void LogRequest(HttpMethod method, Uri requestUri, HttpStatusCode? statusCode, long elapsedMilliseconds, bool cancelled = false)
         {
             if (cancelled)

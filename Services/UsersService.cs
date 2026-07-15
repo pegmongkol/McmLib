@@ -123,7 +123,7 @@ namespace McmLib.Services
                     payload,
                     "No response from server",
                     cancellationToken);
-                if (response.Companies.Count > 0) response.Result = true;
+                //if (response.Companies.Count > 0) response.Result = true;
                 return NormalizeCompaniesResponse(response);
             }
             catch (Exception ex)
@@ -145,7 +145,6 @@ namespace McmLib.Services
                 var url = "users/get_branchs.php";
                 var payload = new
                 {
-                    token = token,
                     user_id,
                     company_id
                 };
@@ -251,7 +250,7 @@ namespace McmLib.Services
 
             if (response.Branches.Count >= 0 && string.IsNullOrWhiteSpace(response.Message) && response.Status == null)
             {
-                response.Result = true;
+                ((ApiResponse)response).Result = true;
             }
 
             return response;
@@ -265,16 +264,12 @@ namespace McmLib.Services
             {
                 return response;
             }
-
             if (response.Companies.Count >= 0 && string.IsNullOrWhiteSpace(response.Message) && response.Status == null)
             {
-                response.Result = true;
+                ((ApiResponse)response).Result = true;
             }
-
             return response;
         }
-
-
 
         private static string EscapeJson(string value)
         {
